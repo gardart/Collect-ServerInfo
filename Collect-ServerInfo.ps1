@@ -344,6 +344,31 @@ Process
 
 
         #---------------------------------------------------------------------
+        # Collect file sharing information and convert to HTML fragment
+        #---------------------------------------------------------------------
+
+        $subhead = "<h3>File Sharing Information</h3>"
+        $htmlbody += $subhead
+
+        Write-Verbose "Collecting file sharing information"
+
+        try
+        {
+            $shareinfo = Get-WmiObject -Class Win32_Share -ComputerName $ComputerName -ErrorAction STOP |
+		Select-Object Name,Path,Description
+
+            $htmlbody += $shareinfo | ConvertTo-Html -Fragment
+            $htmlbody += $spacer
+        }
+        catch
+        {
+            Write-Warning $_.Exception.Message
+            $htmlbody += "<p>An error was encountered. $($_.Exception.Message)</p>"
+            $htmlbody += $spacer
+        }
+
+
+        #---------------------------------------------------------------------
         # Collect network interface information and convert to HTML fragment
         #---------------------------------------------------------------------    
 
